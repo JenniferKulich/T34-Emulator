@@ -3,7 +3,7 @@ from Memory import Memory
 
 memory = Memory()
 
-if (len(sys.argv) >= 2)
+if (len(sys.argv) >= 2):
     memory.LoadFromFile(sys.argv[1])
 
 userInput = ""

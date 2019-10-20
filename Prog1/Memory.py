@@ -3,7 +3,7 @@ from intelhex import IntelHex
 
 class Memory:
     memoryList = [0] * 65536
-    programCounter
+    programCounter = 0
 
     def LoadFromFile(self, fileName):
         intelHex = IntelHex(fileName)
@@ -72,6 +72,10 @@ class Memory:
             splitOnSpaces.pop(0)
         return splitOnColon[0], splitOnSpaces;
 
+    def ReturningOneMemory(self, userInput):
+        print(userInput, end = "  ")
+        print("{0:0{1}X}".format(self.memoryList[int(userInput, 16)], 2))
+
     def PrintRunningProgram(self, userInput):
         self.FormatString();
         userInput = userInput[:-1]
@@ -80,7 +84,3 @@ class Memory:
 
     def FormatString(self):
         print(" PC  OPC  INS   AMOD OPRND  AC XR YR SP NV-BDIZC")
-
-    def ReturningOneMemory(self, userInput):
-        print(userInput, end = "  ")
-        print("{0:0{1}X}".format(self.memoryList[int(userInput, 16)], 2))
