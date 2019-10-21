@@ -1,9 +1,18 @@
 import re
 from intelhex import IntelHex
+from Instructions import Instructions
 
 class Memory:
     memoryList = [0] * 65536
-    programCounter = 0
+    PC = 'start'
+    INS = 0
+    AMOD = 0
+    OPRND = 0
+    AC = 0
+    XR = 0
+    YR = 0
+    SP = 0
+    NVBDIZC = 0
 
     def LoadFromFile(self, fileName):
         intelHex = IntelHex(fileName)
@@ -79,8 +88,32 @@ class Memory:
     def PrintRunningProgram(self, userInput):
         self.FormatString();
         userInput = userInput[:-1]
-        print(" " + userInput)
-        programCounter = userInput
+        position = int(userInput, 16)
+        count = 0
+        while(self.PC != '00'):
+            self.PC = "{0:0{1}X}".format(self.memoryList[position], 2)
+            #self.PC = '0A'
+            self.INS = Instructions.instructions[str(self.PC)]['instruction']
+            self.AMOD = Instructions.instructions[str(self.PC)]['AMOD']
+            self.OPRND = '-- --'
+            self.AC = '22'
+            self.XR = '22'
+            self.YR = '22'
+            self.SP = '22'
+            self.NVBDIZC = '12345678'
+            
+            if(self.AMOD == 'A'):
+                print(" " + str(int(userInput) + count) + "  " + self.PC + "  " + self.INS + "      " + self.AMOD + " "
+                + self.OPRND + "  " + self.AC + " " + self.XR + " " + self.YR + " " + self.SP + " "
+                + self.NVBDIZC)
+            else:
+                print(" " + str(int(userInput) + count) + "  " + self.PC + "  " + self.INS + "   " + self.AMOD + " "
+                + self.OPRND + "  " + self.AC + " " + self.XR + " " + self.YR + " " + self.SP + " "
+                + self.NVBDIZC)
+            position = position + 1
+            count = count + 1
+
+
 
     def FormatString(self):
         print(" PC  OPC  INS   AMOD OPRND  AC XR YR SP NV-BDIZC")
