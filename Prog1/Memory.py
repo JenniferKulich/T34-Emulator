@@ -5,6 +5,7 @@ from Instructions import Instructions
 class Memory:
     memoryList = [0] * 65536
     PC = 'start'
+    PCForLookup = 1;
 
 
 
@@ -100,11 +101,6 @@ class Memory:
         userInput = userInput[:-1]
         position = int(userInput, 16)
         count = 0
-        self.AC = 0
-        self.XR = 0
-        self.YR = 0
-        self.SP = 0xFF
-        self.PC = 'start'
         self.N = 0
         self.V = 0
         self.B = 0
@@ -112,13 +108,16 @@ class Memory:
         self.I = 0
         self.Z = 0
         self.C = 0
+        self.PCForLookup = '1'
 
 
-        while(self.PC != '00'):
-            self.PC = "{0:0{1}X}".format(self.memoryList[position], 2)
-            #self.PC = '0A'
-            self.INS = Instructions.instructions[str(self.PC)]['instruction']
-            self.AMOD = Instructions.instructions[str(self.PC)]['AMOD']
+
+        while(self.PCForLookup != '00'):
+            self.PC = self.memoryList[position]
+            self.PCForLookup = "{0:0{1}X}".format(self.PC, 2)
+
+            self.INS = Instructions.instructions[str(self.PCForLookup)]['instruction']
+            self.AMOD = Instructions.instructions[str(self.PCForLookup)]['AMOD']
 
             if(self.INS == 'ASL'):
                 self.C = ( self.AC & 128 ) >> 7
@@ -175,16 +174,19 @@ class Memory:
                 else:
                     self.Z = 0
 
-            #elif(self.INS == 'NOP'):
-                #no operation
+            elif(self.INS == 'NOP'):
+                pass
 
             elif(self.INS == 'PHA'):
                 #push the accumulator on the stack
                 self.memoryList[self.SP] = self.AC
                 self.SP -= 1
 
-            #elif(self.INS == 'PHP'):
+            elif(self.INS == 'PHP'):
+                #combine registers into one and then put where the
+                #stack pointer is at and then decrement the SP
                 #psh processor status on stack
+                pass
 
             elif(self.INS == 'PLA'):
                 #pull accumulator from stack
@@ -192,8 +194,10 @@ class Memory:
                 self.AC = self.memoryList[self.SP]
                 self.checkingNegativeAndZero(self.AC)
 
-            #elif(self.INS == 'PLP'):
+            elif(self.INS == 'PLP'):
+                #opposite of PHP
                 #pull processor status from stack
+                pass
 
             elif(self.INS == 'ROL'):
                 #rotate one bit left
@@ -250,7 +254,8 @@ class Memory:
             stringForA = "      "
             stringForAnythingElse = "   "
 
-            stringToPrint = " " + str(int(userInput) + count) + "  " + str(self.PC) + "  " + str(self.INS)
+
+            stringToPrint = " " + str(int(userInput) + count) + "  " + "{:02X}".format(self.PC) + "  " + str(self.INS)
             if self.AMOD == 'A':
                 stringToPrint += stringForA
             else:
@@ -270,8 +275,7 @@ class Memory:
     def FormatString(self):
         print(" PC  OPC  INS   AMOD OPRND  AC XR YR SP NV-BDIZC")
 
-    #create a function that will take in the int of what's chaning and then
-    #check the all of the stuff to see if things need to change
+
     def checkingNegativeAndZero(self, register):
         if (register & 128) >> 7 == 1:
             self.N = 1
