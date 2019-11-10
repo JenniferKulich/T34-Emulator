@@ -132,6 +132,17 @@ class Memory:
                 #put all of the single things together and the put
                 #in the memoryList at the stack pointer
                 #put the first 8 bits and then the second 8 bits onto SP
+                temp = self.N << 7
+                temp = self.V << 6
+                temp = self.B << 5
+                temp = self.D << 4
+                temp = self.I << 3
+                temp = self.Z << 2
+                temp = self.C << 1
+
+                self.memoryList[self.SP] = temp
+                self.SP = self.SP - 1
+
 
             elif(self.INS == 'CLC'):
                 self.C = 0
@@ -183,10 +194,20 @@ class Memory:
                 self.SP -= 1
 
             elif(self.INS == 'PHP'):
+                temp = self.N << 7
+                temp = self.V << 6
+                temp = self.B << 5
+                temp = self.D << 4
+                temp = self.I << 3
+                temp = self.Z << 2
+                temp = self.C << 1
+
+                self.memoryList[self.SP] = temp
+                self.SP = self.SP - 1
+
                 #combine registers into one and then put where the
                 #stack pointer is at and then decrement the SP
                 #psh processor status on stack
-                pass
 
             elif(self.INS == 'PLA'):
                 #pull accumulator from stack
@@ -195,9 +216,18 @@ class Memory:
                 self.checkingNegativeAndZero(self.AC)
 
             elif(self.INS == 'PLP'):
+                self.SP += 1
+                temp = self.memoryList[self.SP]
+                self.N = temp >> 7
+                self.V = temp >> 6
+                self.B = temp >> 5
+                self.D = temp >> 4
+                self.I = temp >> 3
+                self.Z = temp >> 2
+                self.C = temp >> 1
                 #opposite of PHP
                 #pull processor status from stack
-                pass
+
 
             elif(self.INS == 'ROL'):
                 #rotate one bit left
