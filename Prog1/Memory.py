@@ -53,21 +53,17 @@ class Memory:
         startAndEnd = self.GetStartAndEndMultipleMemoryLocation(userInput)
         start = int(startAndEnd[0], 16)
         end = int(startAndEnd[1], 16) + 1
-        count = 0
         pad = start % 8
         padString = "   " * pad
 
-        for i in range(start, end):
-            if(count == 0):
-                print("{0:0{1}X}".format(count + i, 1), end = "  " + padString)
-                count = count + pad
-            if(count > 0 and count % 8 == 0):
-                print()
-                print("{0:0{1}X}".format(start + count, 1), end = "  ")
-            print("{0:0{1}X}".format(self.memoryList[i], 2), end = ' ')
-            if(i == end - 1):
-                print()
-            count = count + 1;
+        for i in range(start, end + 1):
+            if i % 8 == 0 or start == i:
+                print("\n" + "{0:0{1}X}".format(i, 2), end = "     ")
+            if i == start:
+                print(padString, end="")
+            print("{0:0{1}X}".format(self.memoryList[i], 2), end = " ")
+        print("\n")
+
 
 
     def GetStartAndEndMultipleMemoryLocation(self, userInput):
@@ -285,7 +281,7 @@ class Memory:
             stringForAnythingElse = "   "
 
 
-            stringToPrint = " " + str(int(userInput) + count) + "  " + "{:02X}".format(self.PC) + "  " + str(self.INS)
+            stringToPrint = " " + hex(position) + "  " + "{0:0{1}X}".format(self.PC, 2) + "  " + str(self.INS)
             if self.AMOD == 'A':
                 stringToPrint += stringForA
             else:
