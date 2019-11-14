@@ -56,7 +56,7 @@ class Memory:
         pad = start % 8
         padString = "   " * pad
 
-        for i in range(start, end + 1):
+        for i in range(start, end):
             if i % 8 == 0 or start == i:
                 print("\n" + "{0:0{1}X}".format(i, 2), end = "     ")
             if i == start:
