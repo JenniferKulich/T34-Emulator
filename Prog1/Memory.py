@@ -281,7 +281,7 @@ class Memory:
             stringForAnythingElse = "   "
 
 
-            stringToPrint = " " + hex(position) + "  " + "{0:0{1}X}".format(self.PC, 2) + "  " + str(self.INS)
+            stringToPrint = " " + hex(position)[2:] + "  " + "{0:0{1}X}".format(self.PC, 2) + "  " + str(self.INS)
             if self.AMOD == 'A':
                 stringToPrint += stringForA
             else:
