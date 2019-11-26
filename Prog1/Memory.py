@@ -283,11 +283,13 @@ class Memory:
 
 #for the C grade functions
             elif(self.INS =='ADC' and self.PCForLookup == '69'):
-                pass
-                #get the next one in the list- position is where it is in the list??
                 position = position + 1
+                temp = self.memoryList[position]
+                self.AC = self.AC + temp
+                if(self.C == 1):
+                    self.AC = self.AC + 1
+                self.AC = self.AC & 255
                 self.OPRND1 = int(self.memoryList[position])
-                self.AC = self.AC + self.memoryList[position]
                 position = position - 1
 
             elif(self.INS == 'ADC' and self.PCForLookup == '65'):
@@ -305,10 +307,16 @@ class Memory:
             elif(self.INS == 'CMP' and self.PCForLookup == 'C9'):
 #how the fuck do we check the carry flag here????
                 position = position + 1
-                temp = self.AC - self.memoryList[position]
+                twosComp = ~self.memoryList[position] + 1
+                temp = self.AC + twosComp
+                checkForCarry = temp & 256
+                if(checkForCarry > 0 or twosComp == 0):
+                    self.C = 1
                 self.checkingNegativeAndZero(temp)
                 self.OPRND1 = self.memoryList[position]
                 position = position -1
+                if(self.C == 1):
+                    self.N = 0
 
             elif(self.INS == 'CMP' and self.PCForLookup == 'C5'):
                 pass
@@ -421,7 +429,6 @@ class Memory:
 
             elif(self.INS == 'STY' and self.PCForLookup == '84'):
                 pass
-
 
             stringForA = "      "
             stringForZpg = "    "
