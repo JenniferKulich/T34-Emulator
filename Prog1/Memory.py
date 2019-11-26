@@ -9,7 +9,8 @@ class Memory:
 
 
 
-    OPRND = '-- --'
+    OPRND1 = 0
+    OPRND2 = "--"
     AC = 0
     XR = 0
     YR = 0
@@ -104,6 +105,9 @@ class Memory:
         self.I = 0
         self.Z = 0
         self.C = 0
+        self.OPRND1 = 0
+        self.OPRND2 = "--"
+
         self.PCForLookup = '1'
 
 
@@ -137,7 +141,8 @@ class Memory:
                 temp = self.C << 1
 
                 self.memoryList[self.SP] = temp
-                self.SP = self.SP - 1
+                self.SP = self.SP - 3
+                self.OPRND1 = "--"
 
 
             elif(self.INS == 'CLC'):
@@ -276,17 +281,169 @@ class Memory:
                 self.checkingNegativeAndZero(self.AC)
 
 
+#for the C grade functions
+            elif(self.INS =='ADC' and self.PCForLookup == '69'):
+                pass
+                #get the next one in the list- position is where it is in the list??
+                position = position + 1
+                self.OPRND1 = int(self.memoryList[position])
+                self.AC = self.AC + self.memoryList[position]
+                position = position - 1
+
+            elif(self.INS == 'ADC' and self.PCForLookup == '65'):
+                pass   
+
+            elif(self.INS == 'AND' and self.PCForLookup == '29'):
+                pass
+            
+            elif(self.INS == 'AND' and self.PCForLookup == '25'):
+                pass
+
+            elif(self.INS == 'ASL' and self.PCForLookup == '06'):
+                pass
+
+            elif(self.INS == 'CMP' and self.PCForLookup == 'C9'):
+#how the fuck do we check the carry flag here????
+                position = position + 1
+                temp = self.AC - self.memoryList[position]
+                self.checkingNegativeAndZero(temp)
+                self.OPRND1 = self.memoryList[position]
+                position = position -1
+
+            elif(self.INS == 'CMP' and self.PCForLookup == 'C5'):
+                pass
+
+            elif(self.INS == 'CPX' and self.PCForLookup == 'E0'):
+                pass
+
+            elif(self.INS == 'CPX' and self.PCForLookup == 'E4'):
+                pass
+
+            elif(self.INS == 'CPY' and self.PCForLookup == 'C0'):
+                pass
+
+            elif(self.INS == 'CPY' and self.PCForLookup == 'C4'):
+                pass
+
+            elif(self.INS == 'DEC' and self.PCForLookup == 'C6'):
+                pass
+
+            elif(self.INS == 'EOR' and self.PCForLookup == '49'):
+                position = position + 1
+                self.AC = self.AC ^ self.memoryList[position]
+                self.OPRND1 = self.memoryList[position]
+                self.checkingNegativeAndZero(self.AC)
+                position = position - 1
+
+            elif(self.INS == 'EOR' and self.PCForLookup == '45'):
+                pass
+#have not tested yet
+                position = position + 1
+                temp = self.memoryList[position]
+                numToEOR = self.memoryList[temp]
+                self.AC = self.AC ^ numToEOR           
+                self.checkingNegativeAndZero(self.AC)
+                position = position - 1
+
+            elif(self.INS == 'INC' and self.PCForLookup == 'E6'):
+                #memory + 1 -> memory in the next location
+                position = position + 1
+                temp = self.memoryList[position]
+                numToInc = self.memoryList[temp]
+                numToInc = numToInc + 1
+                self.memoryList[temp] = numToInc
+#not sure what to check here
+                #self.checkingNegativeAndZero(self.XR)
+                position = position - 1
+
+
+            elif(self.INS == 'LDA' and self.PCForLookup == 'A9'):
+                position = position + 1
+                self.AC = self.memoryList[position]
+                self.OPRND1 = self.AC
+                self.checkingNegativeAndZero(self.AC)
+                position = position - 1
+
+            elif(self.INS == 'LDA' and self.PCForLookup == 'A5'):
+                position = position + 1
+                #get the memo[pos] and then go to that part of the memory and get what's there and put into AC
+                temp = self.memoryList[position]
+                self.AC = self.memoryList[temp]
+                self.checkingNegativeAndZero(self.AC)
+                position = position - 1
+
+            elif(self.INS == 'LDX' and self.PCForLookup == 'A2'):
+                position = position + 1
+                self.OPRND1 = int(self.memoryList[position])
+                self.XR = self.XR + self.memoryList[position]
+                self.checkingNegativeAndZero(self.XR)
+                position = position - 1
+            
+            elif(self.INS == 'LDX' and self.PCForLookup == 'A6'):
+                pass
+
+            elif(self.INS == 'LDY' and self.PCForLookup == 'A0'):
+                pass
+
+            elif(self.INS == 'LDY' and self.PCForLookup == 'A4'):
+                pass
+
+            elif(self.INS == 'LSR' and self.PCForLookup == '46'):
+                pass
+
+            elif(self.INS == 'ORA' and self.PCForLookup == '09'):
+                pass
+
+            elif(self.INS == 'ORA' and self.PCForLookup == '05'):
+                pass
+
+            elif(self.INS == 'ROL' and self.PCForLookup == '26'):
+                pass
+
+            elif(self.INS == 'ROR' and self.PCForLookup == '66'):
+                pass
+
+            elif(self.INS == 'SBC' and self.PCForLookup == 'E9'):
+                pass
+
+            elif(self.INS == 'SBC' and self.PCForLookup == 'E5'):
+                pass
+
+            elif(self.INS == 'STA' and self.PCForLookup == '85'):
+                #get mem[position] and then sta with whatever and mem[pos]
+                position = position + 1
+                temp = self.memoryList[position]
+                self.memoryList[temp] = self.AC
+                position = position - 1
+
+            elif(self.INS == 'STX' and self.PCForLookup == '86'):
+                pass
+
+            elif(self.INS == 'STY' and self.PCForLookup == '84'):
+                pass
+
 
             stringForA = "      "
+            stringForZpg = "    "
             stringForAnythingElse = "   "
 
-
             stringToPrint = " " + hex(position)[2:] + "  " + "{0:0{1}X}".format(self.PC, 2) + "  " + str(self.INS)
-            if self.AMOD == 'A':
+
+            if self.AMOD == 'A' or self.AMOD == '#':
                 stringToPrint += stringForA
+            elif self.AMOD == 'zpg':
+                stringToPrint += stringForZpg
             else:
                 stringToPrint += stringForAnythingElse
-            stringToPrint += str(self.AMOD) + " " + self.OPRND + "  " + "{:02X}".format(self.AC) \
+
+            stringToPrint += str(self.AMOD) + " " 
+
+            if(self.INS == 'BRK'):
+                stringToPrint += self.OPRND1
+            else:
+                stringToPrint += "{:02X}".format(self.OPRND1)
+
+            stringToPrint += " " + str(self.OPRND2) + "  " + "{:02X}".format(self.AC) \
              + " " + "{:02X}".format(self.XR) + " " + "{:02X}".format(self.YR) + " " \
              + "{:02X}".format(self.SP) + " " + str(self.N) + str(self.V) + self.Dash + str(self.B) \
               + str(self.D) + str(self.I) + str(self.Z) + str(self.C)
@@ -295,6 +452,8 @@ class Memory:
             stringToPrint = ""
             position = position + 1
             count = count + 1
+            if(self.AMOD == '#' or self.AMOD == 'zpg'):
+                position = position + 1
 
 
 
