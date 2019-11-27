@@ -119,7 +119,7 @@ class Memory:
             self.INS = Instructions.instructions[str(self.PCForLookup)]['instruction']
             self.AMOD = Instructions.instructions[str(self.PCForLookup)]['AMOD']
 
-            if(self.INS == 'ASL'):
+            if(self.INS == 'ASL' and self.PCForLookup = '06'):
                 self.C = ( self.AC & 128 ) >> 7
                 self.AC <<= 1
                 self.AC &= 255
@@ -177,7 +177,7 @@ class Memory:
                 self.checkingNegativeAndZero(self.YR)
                 self.YR &= 255
 
-            elif(self.INS == 'LSR' and self.AMOD == '4A'):
+            elif(self.INS == 'LSR' and self.PCForLookup == '4A'):
                 #shift one bit right (memory accumulator)
                 self.C = self.AC & 1
                 self.AC >>= 1
@@ -230,7 +230,7 @@ class Memory:
                 #pull processor status from stack
 
 
-            elif(self.INS == 'ROL'):
+            elif(self.INS == 'ROL' and self.PCForLookup == '2A'):
                 #rotate one bit left
                 temp = self.C
                 self.C = ( self.AC & 128 ) >> 7
@@ -239,7 +239,7 @@ class Memory:
                 self.AC &= 255
                 self.checkingNegativeAndZero(self.AC)
 
-            elif(self.INS == 'ROR'):
+            elif(self.INS == 'ROR' and self.PCForLookup = '26'):
                 #rotate one bit right
                 temp = self.C
                 self.C = self.AC & 1
@@ -327,13 +327,35 @@ class Memory:
                 pass
 
             elif(self.INS == 'CPX' and self.PCForLookup == 'E0'):
-                pass
+#not tested
+                position = position + 1
+                twosComp = ~self.memoryList[position] + 1
+                temp = self.XR + twosComp
+                checkForCarry = temp & 256
+                if(checkForCarry > 0 or twosComp == 0):
+                    self.C = 1
+                self.checkingNegativeAndZero(temp)
+                self.OPRND1 = self.memoryList[position]
+                position = position -1
+                if(self.C == 1):
+                    self.N = 0
 
             elif(self.INS == 'CPX' and self.PCForLookup == 'E4'):
                 pass
 
             elif(self.INS == 'CPY' and self.PCForLookup == 'C0'):
-                pass
+#not tested
+                position = position + 1
+                twosComp = ~self.memoryList[position] + 1
+                temp = self.YR + twosComp
+                checkForCarry = temp & 256
+                if(checkForCarry > 0 or twosComp == 0):
+                    self.C = 1
+                self.checkingNegativeAndZero(temp)
+                self.OPRND1 = self.memoryList[position]
+                position = position -1
+                if(self.C == 1):
+                    self.N = 0
 
             elif(self.INS == 'CPY' and self.PCForLookup == 'C4'):
                 pass
