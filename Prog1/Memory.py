@@ -177,7 +177,7 @@ class Memory:
                 self.checkingNegativeAndZero(self.YR)
                 self.YR &= 255
 
-            elif(self.INS == 'LSR'):
+            elif(self.INS == 'LSR' and self.AMOD == '4A'):
                 #shift one bit right (memory accumulator)
                 self.C = self.AC & 1
                 self.AC >>= 1
@@ -299,7 +299,12 @@ class Memory:
                 pass
             
             elif(self.INS == 'AND' and self.PCForLookup == '25'):
-                pass
+                position = position + 1
+                temp = self.memoryList[position]
+                self.AC = self.AC  & self.memoryList[temp]
+                self.OPRND1 = temp
+                self.checkingNegativeAndZero(self.AC)
+                position = position - 1
 
             elif(self.INS == 'ASL' and self.PCForLookup == '06'):
                 pass
@@ -376,6 +381,7 @@ class Memory:
                 position = position + 1
                 #get the memo[pos] and then go to that part of the memory and get what's there and put into AC
                 temp = self.memoryList[position]
+                self.OPRND1 = self.memoryList[position]
                 self.AC = self.memoryList[temp]
                 self.checkingNegativeAndZero(self.AC)
                 position = position - 1
@@ -388,7 +394,12 @@ class Memory:
                 position = position - 1
             
             elif(self.INS == 'LDX' and self.PCForLookup == 'A6'):
-                pass
+                position = position + 1
+                temp = self.memoryList[position]
+                self.XR = self.memoryList[temp]
+                self.OPRND1 = temp
+                self.checkingNegativeAndZero(self.XR)
+                position = position - 1 
 
             elif(self.INS == 'LDY' and self.PCForLookup == 'A0'):
                 pass
@@ -397,7 +408,11 @@ class Memory:
                 pass
 
             elif(self.INS == 'LSR' and self.PCForLookup == '46'):
-                pass
+#I'm not fucking doing the shifts on this one
+                position = position + 1
+                temp = self.memoryList[position]
+                self.OPRND1 = temp
+                position = position - 1
 
             elif(self.INS == 'ORA' and self.PCForLookup == '09'):
                 pass
@@ -425,11 +440,17 @@ class Memory:
                 position = position - 1
 
             elif(self.INS == 'STX' and self.PCForLookup == '86'):
-                pass
+                position = position + 1
+                temp = self.memoryList[position]
+                self.memoryList[temp] = self.XR
+                self.OPRND1 = temp
+                position = position - 1
 
             elif(self.INS == 'STY' and self.PCForLookup == '84'):
                 pass
 
+
+#printing
             stringForA = "      "
             stringForZpg = "    "
             stringForAnythingElse = "   "
