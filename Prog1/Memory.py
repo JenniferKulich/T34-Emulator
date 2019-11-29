@@ -119,7 +119,7 @@ class Memory:
             self.INS = Instructions.instructions[str(self.PCForLookup)]['instruction']
             self.AMOD = Instructions.instructions[str(self.PCForLookup)]['AMOD']
 
-            if(self.INS == 'ASL' and self.PCForLookup = '06'):
+            if(self.INS == 'ASL' and self.PCForLookup == '06'):
                 self.C = ( self.AC & 128 ) >> 7
                 self.AC <<= 1
                 self.AC &= 255
@@ -239,7 +239,7 @@ class Memory:
                 self.AC &= 255
                 self.checkingNegativeAndZero(self.AC)
 
-            elif(self.INS == 'ROR' and self.PCForLookup = '26'):
+            elif(self.INS == 'ROR' and self.PCForLookup == '26'):
                 #rotate one bit right
                 temp = self.C
                 self.C = self.AC & 1
@@ -293,10 +293,24 @@ class Memory:
                 position = position - 1
 
             elif(self.INS == 'ADC' and self.PCForLookup == '65'):
-                pass   
+#not tested but should be the same
+                position = position + 1
+                temp = self.memoryList[position]
+                self.AC = self.AC + self.memoryList[temp]
+                if(self.C == 1):
+                    self.AC = self.AC + 1
+                self.AC = self.AC & 255
+        #think this is correct- probably not
+                self.OPRND1 = self.memoryList[position]
+                position = position - 1
 
             elif(self.INS == 'AND' and self.PCForLookup == '29'):
-                pass
+#not tested, but should be correct because of the next one that was tested
+                position = position + 1
+                self.AC = self.AC & self.memoryList[position]
+                self.OPRND1 = self.memoryList[position]
+                self.checkingNegativeAndZero[self.AC]
+                position = position - 1
             
             elif(self.INS == 'AND' and self.PCForLookup == '25'):
                 position = position + 1
@@ -307,10 +321,18 @@ class Memory:
                 position = position - 1
 
             elif(self.INS == 'ASL' and self.PCForLookup == '06'):
-                pass
+#not tested but may be correct because of the one from last program
+#probably not because I'm such a dumbass
+                position = position + 1
+                temp = self.memoryList[position]
+                self.C = ( self.memoryList[temp] & 128 ) >> 7
+                self.memoryList[temp] <<= 1
+                self.memoryList[temp] &= 255
+                self.checkingNegativeAndZero(self.memoryList[temp])
+                position = position - 1
+
 
             elif(self.INS == 'CMP' and self.PCForLookup == 'C9'):
-#how the fuck do we check the carry flag here????
                 position = position + 1
                 twosComp = ~self.memoryList[position] + 1
                 temp = self.AC + twosComp
@@ -324,7 +346,19 @@ class Memory:
                     self.N = 0
 
             elif(self.INS == 'CMP' and self.PCForLookup == 'C5'):
-                pass
+#not tested
+                position = position + 1
+                temp = self.memoryList[position]
+                twosComp = ~self.memoryList[temp] + 1
+                operation = self.AC + twosComp
+                checkForCarry = operation & 256
+                if(checkForCarry > 0 or twosComp ==0):
+                    self.C = 1
+                self.checkingNegativeAndZero(temp)
+                self.OPRND1 - self.memoryList[temp]
+                position = position - 1
+                if(self.C == 1):
+                    self.N = 0
 
             elif(self.INS == 'CPX' and self.PCForLookup == 'E0'):
 #not tested
@@ -341,7 +375,19 @@ class Memory:
                     self.N = 0
 
             elif(self.INS == 'CPX' and self.PCForLookup == 'E4'):
-                pass
+#not tested
+                position = position + 1
+                temp = self.memoryList[position]
+                twosComp = ~self.memoryList[temp] + 1
+                operation = self.XR + twosComp
+                checkForCarry = operation & 256
+                if(checkForCarry > 0 or twosComp == 0):
+                    self.C = 1
+                self.checkingNegativeAndZero(temp)
+                self.OPRND1 - self.memoryList[temp]
+                position = position - 1
+                if(self.C == 1):
+                    self.N = 0
 
             elif(self.INS == 'CPY' and self.PCForLookup == 'C0'):
 #not tested
@@ -358,10 +404,27 @@ class Memory:
                     self.N = 0
 
             elif(self.INS == 'CPY' and self.PCForLookup == 'C4'):
-                pass
+#not tested
+                position = position + 1
+                temp = self.memoryList[position]
+                twosComp = ~self.memoryList[temp] + 1
+                operation = self.YR + twosComp
+                checkForCarry = operation & 256
+                if(checkForCarry > 0 or twosComp ==0):
+                    self.C = 1
+                self.checkingNegativeAndZero(temp)
+                self.OPRND1 - self.memoryList[temp]
+                position = position - 1
+                if(self.C == 1):
+                    self.N = 0
 
             elif(self.INS == 'DEC' and self.PCForLookup == 'C6'):
-                pass
+#not tested
+                position = position - 1
+                temp = self.memoryList[position]
+                self.memoryList[temp] = self.memoryList[temp] - 1
+                self.checkingNegativeAndZero(self.memoryList[temp])
+                position = position + 1
 
             elif(self.INS == 'EOR' and self.PCForLookup == '49'):
                 position = position + 1
@@ -371,7 +434,6 @@ class Memory:
                 position = position - 1
 
             elif(self.INS == 'EOR' and self.PCForLookup == '45'):
-                pass
 #have not tested yet
                 position = position + 1
                 temp = self.memoryList[position]
@@ -424,35 +486,98 @@ class Memory:
                 position = position - 1 
 
             elif(self.INS == 'LDY' and self.PCForLookup == 'A0'):
-                pass
+#not tested- but LDX was tested, so should be correct
+                position = position + 1
+                self.OPRND1 = self.memoryList[position]
+                self.YR = self.YR + self.memoryList[position]
+                self.checkingNegativeAndZero(self.YR)
+                position = position - 1
 
             elif(self.INS == 'LDY' and self.PCForLookup == 'A4'):
-                pass
+#not tested- but LDX was tested, so should be correct
+                position = position + 1
+                temp = self.memoryList[position]
+                self.YR = self.memoryList[temp]
+                self.OPRND1 = temp
+                self.checkingNegativeAndZero(self.YR)
+                position = position - 1 
 
             elif(self.INS == 'LSR' and self.PCForLookup == '46'):
-#I'm not fucking doing the shifts on this one
+#I'm haven't done the fucking shifts on this one
                 position = position + 1
                 temp = self.memoryList[position]
                 self.OPRND1 = temp
                 position = position - 1
 
             elif(self.INS == 'ORA' and self.PCForLookup == '09'):
-                pass
+#not testd, but taken from AND one which was based off of the tested AND one, so should be correct unless
+#I'm being a dumb bitch like usual
+                position = position + 1
+                self.AC = self.AC | self.memoryList[position]
+                self.OPRND1 = self.memoryList[position]
+                self.checkingNegativeAndZero[self.AC]
+                position = position - 1
+
 
             elif(self.INS == 'ORA' and self.PCForLookup == '05'):
-                pass
+#not tested, but taken from AND one, so should be right
+                position = position + 1
+                temp = self.memoryList[position]
+                self.AC = self.AC  | self.memoryList[temp]
+                self.OPRND1 = temp
+                self.checkingNegativeAndZero(self.AC)
+                position = position - 1
+
 
             elif(self.INS == 'ROL' and self.PCForLookup == '26'):
-                pass
+#not tested but probably close because of the last one- using the memory insead of AC
+#ask Nate how you did it because you're too dumb to actually have gotten it correct
+                position = position + 1
+                fromMemory = self.memoryList[position]
+                temp = self.C
+                self.C = (spotInMem & 128 ) >> 7
+                self.memoryList[fromMemory] <<= 1
+                self.memoryList[fromMemory] |= temp
+                self.memoryList[fromMemory] &= 255
+                self.checkingNegativeAndZero(self.memoryList[fromMemory])
+                position = position - 1
 
             elif(self.INS == 'ROR' and self.PCForLookup == '66'):
-                pass
+#took from last one but probably way off because I'm a dumbass, so ask Nate what he did
+                position = position + 1
+                fromMemory = self.memoryList[position]
+                temp = self.C
+                self.C = self.AC & 1
+                self.memoryList[fromMemory] >>= 1
+                self.memoryList[fromMemory] |= temp << 7
+                self.memoryList[fromMemory] &= 255
+                self.checkingNegativeAndZero(self.memoryList[fromMemory])
+                position = position - 1
 
             elif(self.INS == 'SBC' and self.PCForLookup == 'E9'):
-                pass
+#not tested, but should be sort of correct because of tested one
+                position = position + 1
+                temp = self.memoryList[position]
+                self.AC = self.AC - temp
+                if(self.C == 1):
+                    self.AC = self.AC - 1
+                self.AC = self.AC & 255
+                self.OPRND1 = self.memoryList[position]
+                position = position - 1
+
 
             elif(self.INS == 'SBC' and self.PCForLookup == 'E5'):
-                pass
+#not tested and probably really wrong because I'm a dumbass
+                position = position + 1
+                temp = self.memoryList[position]
+                self.AC = self.AC - self.memoryList[temp]
+                if(self.C == 1):
+                    self.AC = self.AC - 1
+                self.AC = self.AC & 255
+        #think this is correct- probably not
+                self.OPRND1 = self.memoryList[position]
+                position = position - 1
+
 
             elif(self.INS == 'STA' and self.PCForLookup == '85'):
                 #get mem[position] and then sta with whatever and mem[pos]
@@ -469,7 +594,11 @@ class Memory:
                 position = position - 1
 
             elif(self.INS == 'STY' and self.PCForLookup == '84'):
-                pass
+#not tested
+                position = position + 1
+                temp = self.memoryList[position]
+                self.memoryList[temp] = self.YR
+                position = position - 1
 
 
 #printing

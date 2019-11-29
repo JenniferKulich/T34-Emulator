@@ -44,7 +44,7 @@ class Instructions:
     '8A': {'instruction': 'TXA', 'AMOD': 'impl'},
     '9A': {'instruction': 'TXS', 'AMOD': 'impl'},
     '98': {'instruction': 'TYA', 'AMOD': 'impl'},
-#below is all instructions for C grade
+#below are all instructions for C grade
     '69': {'instruction': 'ADC', 'AMOD': '#'},
     '65': {'instruction': 'ADC', 'AMOD': 'zpg'},
     '29': {'instruction': 'AND', 'AMOD': '#'},
@@ -76,3 +76,5 @@ class Instructions:
     '85': {'instruction': 'STA', 'AMOD': 'zpg'},
     '86': {'instruction': 'STX', 'AMOD': 'zpg'},
     '84': {'instruction': 'STY', 'AMOD': 'zpg'}}
+
+    #below are all for a B
