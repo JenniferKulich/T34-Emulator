@@ -610,7 +610,7 @@ class Memory:
 
             if self.AMOD == 'A' or self.AMOD == '#':
                 stringToPrint += stringForA
-            elif self.AMOD == 'zpg':
+            elif self.AMOD == 'zpg' or self.AMOD == 'abs' or self.AMOD == 'rel':
                 stringToPrint += stringForZpg
             else:
                 stringToPrint += stringForAnythingElse
