@@ -32,7 +32,7 @@ class Memory:
             self.memoryList[addr] = dat
 
     def CheckIfReturningMultipleMemory(self, userInput):
-        if(re.match(r"([0-9]*)\.([0-9]*[a-zA-Z]*)", userInput)):
+        if(re.match(r"([0-9a-fA-F]+)\.([0-9a-fA-F]+)", userInput)):
             return True
         else:
             return False
@@ -44,11 +44,7 @@ class Memory:
             return False
 
     def CheckIfRunningProgram(self, userInput):
-        if(self.CheckIfReturningMultipleMemory(userInput) == False
-        and re.match(r"[0-9]*[R]", userInput)):
-            return True
-        else:
-            return False
+        return not self.CheckIfReturningMultipleMemory(userInput) and re.match(r"[0-9a-fA-F]+[R]", userInput)
 
     def PrintMultipleMemory(self, userInput):
         startAndEnd = self.GetStartAndEndMultipleMemoryLocation(userInput)
@@ -119,7 +115,7 @@ class Memory:
             self.INS = Instructions.instructions[str(self.PCForLookup)]['instruction']
             self.AMOD = Instructions.instructions[str(self.PCForLookup)]['AMOD']
 
-            if(self.INS == 'ASL' and self.PCForLookup == '06'):
+            if(self.INS == 'ASL' and self.PCForLookup == '0A'):
                 self.C = ( self.AC & 128 ) >> 7
                 self.AC <<= 1
                 self.AC &= 255
@@ -239,7 +235,7 @@ class Memory:
                 self.AC &= 255
                 self.checkingNegativeAndZero(self.AC)
 
-            elif(self.INS == 'ROR' and self.PCForLookup == '26'):
+            elif(self.INS == 'ROR' and self.PCForLookup == '6A'):
                 #rotate one bit right
                 temp = self.C
                 self.C = self.AC & 1
@@ -601,6 +597,72 @@ class Memory:
                 position = position - 1
 
 
+#for the B grades 
+            elif(self.INS == 'ADC' and self.PCForLookup == '6D'):
+                pass
+            elif(self.INS == 'AND' and self.PCForLookup == '2D'):
+                pass
+            elif(self.INS == 'ASL' and self.PCForLookup == '0E'):
+                pass
+            elif(self.INS == 'BCC' and self.PCForLookup == '90'):
+                pass
+            elif(self.INS == 'BSC' and self.PCForLookup == '84'):
+                pass
+            elif(self.INS == 'BEQ' and self.PCForLookup == 'F0'):
+                pass
+            elif(self.INS == 'BIT' and self.PCForLookup == '2C'):
+                pass
+            elif(self.INS == 'BMI' and self.PCForLookup == '30'):
+                pass
+            elif(self.INS == 'BNE' and self.PCForLookup == 'D0'):
+                pass
+            elif(self.INS == 'BPL' and self.PCForLookup == '10'):
+                pass
+            elif(self.INS == 'BVC' and self.PCForLookup == '50'):
+                pass
+            elif(self.INS == 'BVS' and self.PCForLookup == '70'):
+                pass
+            elif(self.INS == 'CMP' and self.PCForLookup == 'CD'):
+                pass
+            elif(self.INS == 'CPX' and self.PCForLookup == 'EC'):
+                pass
+            elif(self.INS == 'CPY' and self.PCForLookup == 'CC'):
+                pass
+            elif(self.INS == 'DEC' and self.PCForLookup == 'CE'):
+                pass
+            elif(self.INS == 'EOR' and self.PCForLookup == '4D'):
+                pass
+            elif(self.INS == 'INC' and self.PCForLookup == 'EE'):
+                pass
+            elif(self.INS == 'JMP' and self.PCForLookup == '4C'):
+                pass
+            elif(self.INS == 'JSR' and self.PCForLookup == '20'):
+                pass
+            elif(self.INS == 'LDA' and self.PCForLookup == 'AD'):
+                pass
+            elif(self.INS == 'LDX' and self.PCForLookup == 'AE'):
+                pass
+            elif(self.INS == 'LDY' and self.PCForLookup == 'AC'):
+                pass
+            elif(self.INS == 'LSR' and self.PCForLookup == '4E'):
+                pass
+            elif(self.INS == 'ORA' and self.PCForLookup == '0D'):
+                pass
+            elif(self.INS == 'ROL' and self.PCForLookup == '2E'):
+                pass
+            elif(self.INS == 'ROR' and self.PCForLookup == '6E'):
+                pass
+            elif(self.INS == 'RTS' and self.PCForLookup == '60'):
+                pass
+            elif(self.INS == 'SBC' and self.PCForLookup == 'ED'):
+                pass
+            elif(self.INS == 'STA' and self.PCForLookup == '8D'):
+                pass
+            elif(self.INS == 'STX' and self.PCForLookup == '8E'):
+                pass
+            elif(self.INS == 'STY' and self.PCForLookup == '8C'):
+                pass
+
 #printing
             stringForA = "      "
             stringForZpg = "    "
@@ -641,11 +703,12 @@ class Memory:
 
 
     def checkingNegativeAndZero(self, register):
+        if register == 0:
+            self.Z = 1
+        else:
+            self.Z = 0
+
         if (register & 128) >> 7 == 1:
             self.N = 1
         else:
             self.N = 0
-        if register == 00:
-            self.Z == 1
-        else:
-            self.Z = 0
