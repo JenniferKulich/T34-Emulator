@@ -283,8 +283,9 @@ class Memory:
                 self.AC = self.AC + temp
                 if(self.C == 1):
                     self.AC = self.AC + 1
-                self.AC = self.AC & 255
                 self.OPRND1 = int(self.memoryList[self.PC])
+                self.checkForCarrySet(self.AC)
+                self.AC = self.AC & 255
                 self.PC = self.PC - 1
 
             elif(self.INS == 'ADC' and self.OPCode == '65'):
@@ -293,8 +294,9 @@ class Memory:
                 self.AC = self.AC + self.memoryList[temp]
                 if(self.C == 1):
                     self.AC = self.AC + 1
-                self.AC = self.AC & 255
                 self.OPRND1 = self.memoryList[temp]
+                self.checkForCarrySet(self.AC)
+                self.AC = self.AC & 255
                 self.PC = self.PC - 1
 
             elif(self.INS == 'AND' and self.OPCode == '29'):
@@ -321,6 +323,7 @@ class Memory:
                 self.memoryList[temp] <<= 1
                 self.memoryList[temp] &= 255
                 self.checkingNegativeAndZero(self.memoryList[temp])
+                self.checkForCarrySet(self.memoryList[temp])
                 self.PC = self.PC - 1
 
 
@@ -502,7 +505,7 @@ class Memory:
                 self.PC = self.PC + 1
                 self.AC = self.AC | self.memoryList[self.PC]
                 self.OPRND1 = self.memoryList[self.PC]
-                #self.checkingNegativeAndZero[self.AC]
+                self.checkingNegativeAndZero[self.AC]
                 self.PC = self.PC - 1
 
 
@@ -751,3 +754,10 @@ class Memory:
             self.N = 1
         else:
             self.N = 0
+    
+    def checkForCarrySet(self, register):
+        temp = register & 256
+        if(temp > 0):
+            self.C = 1
+        else:
+            self.C = 0
