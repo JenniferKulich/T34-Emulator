@@ -142,6 +142,8 @@ class Memory:
 
             elif(self.INS == 'CLC'):
                 self.C = 0
+                self.OPRND1 = "--"
+                self.OPRND2 = "--"
 
             elif(self.INS == 'CLD'):
                 self.D = 0
@@ -161,6 +163,8 @@ class Memory:
                 self.YR = self.YR - 1
                 self.checkingNegativeAndZero(self.YR)
                 self.YR &= 255
+                self.OPRND1 = "--"
+                self.OPRND2 = '--'
 
             elif(self.INS == 'INX'):
                 self.XR = self.XR + 1
@@ -573,10 +577,10 @@ class Memory:
 
             elif(self.INS == 'STA' and self.OPCode == '85'):
                 #get mem[position] and then sta with whatever and mem[pos]
-                self.PC = self.PC + 1
-                temp = self.memoryList[self.PC]
+                temp = self.memoryList[self.PC + 1]
+                self.OPRND1 = temp
                 self.memoryList[temp] = self.AC
-                self.PC = self.PC - 1
+
 
             elif(self.INS == 'STX' and self.OPCode == '86'):
                 self.PC = self.PC + 1
@@ -724,6 +728,8 @@ class Memory:
 
             if(self.INS == 'BRK'):
                 stringToPrint +=  "-- --"
+            elif(self.OPRND1 == "--" and self.OPRND2 == "--"):
+                stringToPrint += self.OPRND1 + " " + self.OPRND2
             else:
                 stringToPrint += "{:02X}".format(self.OPRND1) + " "
                 if(self.OPRND2 == "--"):
@@ -747,6 +753,7 @@ class Memory:
                     self.PC = self.PC + 2
             if(self.INS == 'BNE' and self.Z == 0):
                 self.PC = self.PC + self.OPRND1 + 2
+                
 
 
 
