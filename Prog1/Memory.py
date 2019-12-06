@@ -595,17 +595,18 @@ class Memory:
 
 #for the B grades 
             elif(self.INS == 'ADC' and self.OPCode == '6D'):
-                self.OPRND1 = self.memoryList[self.PC + 1]
-                self.OPRND2 = self.memoryList[self.PC + 2]
-                temp = self.OPRND2
-                temp <<= 8 
-                temp = self.OPRND1 | temp
+                temp = self.getOPRNDandTemp()
                 self.AC = self.AC + self.memoryList[temp]
+                if(self.C == 1):
+                    self.AC = self.AC + 1
+                self.checkingNegativeAndZero(self.AC)
 
             elif(self.INS == 'AND' and self.OPCode == '2D'):
                 pass
             elif(self.INS == 'ASL' and self.OPCode == '0E'):
-                pass
+#need to move into SR
+                temp = self.getOPRNDandTemp()
+
             elif(self.INS == 'BCC' and self.OPCode == '90'):
                 self.OPRND1 = self.memoryList[self.PC + 1]
                 self.OPRND2 = "--"
@@ -618,17 +619,20 @@ class Memory:
             elif(self.INS == 'BEQ' and self.OPCode == 'F0'):
                 pass
             elif(self.INS == 'BIT' and self.OPCode == '2C'):
-                pass
+#need to move into SR
+                temp = self.getOPRNDandTemp()
+                operation = self.AC & self.memoryList[temp]
+                
+                
+
             elif(self.INS == 'BMI' and self.OPCode == '30'):
                 pass
+
             elif(self.INS == 'BNE' and self.OPCode == 'D0'):
                 self.OPRND1 = self.memoryList[self.PC + 1]
                 self.OPRND2 = "--"
                 #check if z == 0
                 #position is technically at 02- so then that + 2 should get to the 6C
-                if(self.Z == 0):
-                    self.PC = self.PC + self.OPRND1 + 1
-
                 #print(str(whereToJumpTo))
                 #position = position + self.OPRND1 + 1
                 #print(str(position))
@@ -668,12 +672,9 @@ class Memory:
                 self.SP = self.SP - 2
 
             elif(self.INS == 'LDA' and self.OPCode == 'AD'):
-                self.OPRND1 = self.memoryList[self.PC + 1]
-                self.OPRND2 = self.memoryList[self.PC + 2]
-                temp = self.OPRND2
-                temp <<= 8 
-                temp = self.OPRND1 | temp
-                self.AC = self.memoryList[temp]                
+                temp = self.getOPRNDandTemp()
+                self.AC = self.memoryList[temp]  
+                self.checkingNegativeAndZero(self.AC)              
 
             elif(self.INS == 'LDX' and self.OPCode == 'AE'):
                 pass
@@ -682,17 +683,24 @@ class Memory:
             elif(self.INS == 'LSR' and self.OPCode == '4E'):
                 pass
             elif(self.INS == 'ORA' and self.OPCode == '0D'):
-                pass
+                temp = self.getOPRNDandTemp()
+                self.AC = self.AC | self.memoryList[temp]
+
             elif(self.INS == 'ROL' and self.OPCode == '2E'):
                 pass
+
             elif(self.INS == 'ROR' and self.OPCode == '6E'):
-                pass
+#need to move into SR
+                temp = self.getOPRNDandTemp()
+
             elif(self.INS == 'RTS' and self.OPCode == '60'):
                 pass
             elif(self.INS == 'SBC' and self.OPCode == 'ED'):
                 pass
             elif(self.INS == 'STA' and self.OPCode == '8D'):
-                pass
+                temp = self.getOPRNDandTemp()
+                self.memoryList[temp] = self.AC
+
             elif(self.INS == 'STX' and self.OPCode == '8E'):
                 pass
             elif(self.INS == 'STY' and self.OPCode == '8C'):
@@ -730,13 +738,15 @@ class Memory:
 
             print(stringToPrint)
             stringToPrint = ""
-            if(self.INS != 'BCC'):
+            if(self.INS != 'BCC' and self.INS != 'BNE'):
                 self.PC = self.PC + 1
                 count = count + 1
                 if(self.AMOD == '#' or self.AMOD == 'zpg'):
                     self.PC = self.PC + 1
                 if(self.AMOD == "abs"):
                     self.PC = self.PC + 2
+            if(self.INS == 'BNE' and self.Z == 0):
+                self.PC = self.PC + self.OPRND1 + 2
 
 
 
@@ -761,3 +771,12 @@ class Memory:
             self.C = 1
         else:
             self.C = 0
+
+    def getOPRNDandTemp(self):
+        self.OPRND1 = self.memoryList[self.PC + 1]
+        self.OPRND2 = self.memoryList[self.PC + 2]
+        temp = self.OPRND2 
+        temp <<= 8
+        temp = self.OPRND1| temp
+        return temp
+
