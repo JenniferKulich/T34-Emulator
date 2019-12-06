@@ -511,7 +511,7 @@ class Memory:
                 position = position + 1
                 self.AC = self.AC | self.memoryList[position]
                 self.OPRND1 = self.memoryList[position]
-                self.checkingNegativeAndZero[self.AC]
+                #self.checkingNegativeAndZero[self.AC]
                 position = position - 1
 
 
@@ -599,7 +599,13 @@ class Memory:
 
 #for the B grades 
             elif(self.INS == 'ADC' and self.PCForLookup == '6D'):
-                pass
+                self.OPRND1 = self.memoryList[position + 1]
+                self.OPRND2 = self.memoryList[position + 2]
+                temp = self.OPRND2
+                temp <<= 8 
+                temp = self.OPRND1 | temp
+                self.AC = self.AC + self.memoryList[temp]
+
             elif(self.INS == 'AND' and self.PCForLookup == '2D'):
                 pass
             elif(self.INS == 'ASL' and self.PCForLookup == '0E'):
@@ -615,7 +621,16 @@ class Memory:
             elif(self.INS == 'BMI' and self.PCForLookup == '30'):
                 pass
             elif(self.INS == 'BNE' and self.PCForLookup == 'D0'):
-                pass
+                self.OPRND1 = self.memoryList[position + 1]
+                self.OPRND2 = "--"
+                whereToJumpTo = position + self.OPRND1 + 1
+                #check if z == 0
+                #position is technically at 02- so then that + 2 should get to the 6C
+                if(str(self.memoryList[whereToJumpTo]) == '0'):
+                    print("hello")
+                #print(str(whereToJumpTo))
+                #position = position + self.OPRND1
+
             elif(self.INS == 'BPL' and self.PCForLookup == '10'):
                 pass
             elif(self.INS == 'BVC' and self.PCForLookup == '50'):
@@ -639,7 +654,13 @@ class Memory:
             elif(self.INS == 'JSR' and self.PCForLookup == '20'):
                 pass
             elif(self.INS == 'LDA' and self.PCForLookup == 'AD'):
-                pass
+                self.OPRND1 = self.memoryList[position + 1]
+                self.OPRND2 = self.memoryList[position + 2]
+                temp = self.OPRND2
+                temp <<= 8 
+                temp = self.OPRND1 | temp
+                self.AC = self.memoryList[temp]                
+
             elif(self.INS == 'LDX' and self.PCForLookup == 'AE'):
                 pass
             elif(self.INS == 'LDY' and self.PCForLookup == 'AC'):
@@ -682,9 +703,13 @@ class Memory:
             if(self.INS == 'BRK'):
                 stringToPrint += self.OPRND1
             else:
-                stringToPrint += "{:02X}".format(self.OPRND1)
+                stringToPrint += "{:02X}".format(self.OPRND1) + " "
+                if(self.OPRND2 == "--"):
+                    stringToPrint += str(self.OPRND2)
+                else:
+                    stringToPrint += "{:02X}".format(self.OPRND2)
 
-            stringToPrint += " " + str(self.OPRND2) + "  " + "{:02X}".format(self.AC) \
+            stringToPrint += "  " + "{:02X}".format(self.AC) \
              + " " + "{:02X}".format(self.XR) + " " + "{:02X}".format(self.YR) + " " \
              + "{:02X}".format(self.SP) + " " + str(self.N) + str(self.V) + self.Dash + str(self.B) \
               + str(self.D) + str(self.I) + str(self.Z) + str(self.C)
@@ -695,7 +720,8 @@ class Memory:
             count = count + 1
             if(self.AMOD == '#' or self.AMOD == 'zpg'):
                 position = position + 1
-
+            if(self.AMOD == "abs"):
+                position = position + 2
 
 
     def FormatString(self):
