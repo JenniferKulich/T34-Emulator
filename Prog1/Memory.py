@@ -288,19 +288,16 @@ class Memory:
                 self.PC = self.PC - 1
 
             elif(self.INS == 'ADC' and self.OPCode == '65'):
-#not tested but should be the same
                 self.PC = self.PC + 1
                 temp = self.memoryList[self.PC]
                 self.AC = self.AC + self.memoryList[temp]
                 if(self.C == 1):
                     self.AC = self.AC + 1
                 self.AC = self.AC & 255
-        #think this is correct- probably not
-                self.OPRND1 = self.memoryList[self.PC]
+                self.OPRND1 = self.memoryList[temp]
                 self.PC = self.PC - 1
 
             elif(self.INS == 'AND' and self.OPCode == '29'):
-#not tested, but should be correct because of the next one that was tested
                 self.PC = self.PC + 1
                 self.AC = self.AC & self.memoryList[self.PC]
                 self.OPRND1 = self.memoryList[self.PC]
@@ -341,7 +338,6 @@ class Memory:
                     self.N = 0
 
             elif(self.INS == 'CMP' and self.OPCode == 'C5'):
-#not tested
                 self.PC = self.PC + 1
                 temp = self.memoryList[self.PC]
                 twosComp = ~self.memoryList[temp] + 1
@@ -414,7 +410,6 @@ class Memory:
                     self.N = 0
 
             elif(self.INS == 'DEC' and self.OPCode == 'C6'):
-#pretty sure this is correct
                 self.PC = self.PC + 1
                 temp = self.memoryList[self.PC]
                 self.memoryList[temp] = self.memoryList[temp] - 1
@@ -429,7 +424,6 @@ class Memory:
                 self.PC = self.PC - 1
 
             elif(self.INS == 'EOR' and self.OPCode == '45'):
-#have not tested yet
                 self.PC = self.PC + 1
                 temp = self.memoryList[self.PC]
                 numToEOR = self.memoryList[temp]
