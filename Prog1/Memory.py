@@ -106,6 +106,7 @@ class Memory:
 
         self.OPCode = '1'
         self.PCStrorage = 0
+        self.newPC = 0
 
 
 
@@ -147,12 +148,18 @@ class Memory:
 
             elif(self.INS == 'CLD'):
                 self.D = 0
+                self.OPRND1 = "--"
+                self.OPRND2 = "--"
 
             elif(self.INS == 'CLI'):
                 self.I = 0
+                self.OPRND1 = "--"
+                self.OPRND2 = "--"
 
             elif(self.INS == 'CLV'):
                 self.V = 0
+                self.OPRND1 = "--"
+                self.OPRND2 = "--"
 
             elif self.INS == 'DEX':
                 self.XR = self.XR - 1
@@ -534,6 +541,16 @@ class Memory:
                 self.OPRND1 = temp
 
 
+
+
+
+
+
+
+
+
+
+
 #for the B grades 
             elif(self.INS == 'ADC' and self.OPCode == '6D'):
                 temp = self.getOPRNDandTemp()
@@ -556,7 +573,9 @@ class Memory:
                 self.OPRND1 = self.memoryList[self.PC + 1]
                 self.OPRND2 = "--"
                 if(self.C == 0):
-                    self.PC = self.PCStrorage
+        #not working because I need to sign extend
+                    self.newPC = self.OPRND1 + self.PC
+                    
 
 
             elif(self.INS == 'BSC' and self.OPCode == 'BO'):
@@ -613,14 +632,16 @@ class Memory:
                 self.checkingNegativeAndZero(self.memoryList[temp])
 
 
-
             elif(self.INS == 'JMP' and self.OPCode == '6C'):
 #aw hell no. I have no idea what this is doing- wtf is up with the PC???
-                self.OPRND1 = self.memoryList[self.PC + 1]
-                self.OPRND2 = self.memoryList[self.PC + 2]
-                self.PCStrorage = self.PC + 3
+                temp = self.getOPRNDandTemp()
+                operand1 = self.memoryList[temp]  
+                operand2 = self.memoryList[temp + 1]
+                self.newPC = operand2
+                self.newPC <<= 8
+                self.newPC = operand1 | self.newPC
+                
 
-                self.PC = self.PC + 6
 
 
             elif(self.INS == 'JSR' and self.OPCode == '20'):
@@ -636,9 +657,19 @@ class Memory:
                 self.checkingNegativeAndZero(self.AC)              
 
             elif(self.INS == 'LDX' and self.OPCode == 'AE'):
-                pass
+#not tested but taken from one that was
+                temp = self.getOPRNDandTemp()
+                self.XR = self.XR + self.memoryList[temp]
+                self.checkingNegativeAndZero(self.XR)
+
             elif(self.INS == 'LDY' and self.OPCode == 'AC'):
-                pass
+#not tested but taken from one that was
+                temp = self.getOPRNDandTemp()
+                self.YR = self.YR + self.memoryList[temp]
+                self.checkingNegativeAndZero(self.YR)
+
+
+
             elif(self.INS == 'LSR' and self.OPCode == '4E'):
                 pass
             elif(self.INS == 'ORA' and self.OPCode == '0D'):
@@ -705,13 +736,17 @@ class Memory:
 
             print(stringToPrint)
             stringToPrint = ""
-            if(self.INS != 'BCC' and self.INS != 'BNE'):
+            if(self.INS != 'BCC' and self.INS != 'BNE' and self.INS != 'JMP'):
                 self.PC = self.PC + 1
                 count = count + 1
                 if(self.AMOD == '#' or self.AMOD == 'zpg'):
                     self.PC = self.PC + 1
                 if(self.AMOD == "abs"):
                     self.PC = self.PC + 2
+            if(self.INS == 'JMP' and self.OPCode == '6C'):
+                self.PC = self.newPC
+            if(self.INS == 'BCC'):
+                self.PC = self.newPC
             if(self.INS == 'BNE' and self.Z == 0):
                 self.PC = self.PC + self.OPRND1 + 2
                 
