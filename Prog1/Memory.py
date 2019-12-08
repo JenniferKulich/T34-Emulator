@@ -570,43 +570,49 @@ class Memory:
                 temp = self.getOPRNDandTemp()
 
             elif(self.INS == 'BCC' and self.OPCode == '90'):
-                self.OPRND1 = self.memoryList[self.PC + 1]
-                self.OPRND2 = "--"
-                if(self.C == 0):
-        #not working because I need to sign extend
-                    self.newPC = self.OPRND1 + self.PC
-                    
-
+                self.branching(self.C, 0)
+                  
 
             elif(self.INS == 'BSC' and self.OPCode == 'BO'):
-                pass
+#not tested but based off of BCC- tested
+                self.branching(self.C, 1)
+
+
             elif(self.INS == 'BEQ' and self.OPCode == 'F0'):
-                pass
+#not tested but based off of BCC- tested
+                self.branching(self.Z, 1)
+
+
             elif(self.INS == 'BIT' and self.OPCode == '2C'):
 #need to move into SR
                 temp = self.getOPRNDandTemp()
                 operation = self.AC & self.memoryList[temp]
-                
-                
+
+        
+
+
 
             elif(self.INS == 'BMI' and self.OPCode == '30'):
-                pass
+#not tested but based off of BCC- tested
+                self.branching(self.N, 1)
+
 
             elif(self.INS == 'BNE' and self.OPCode == 'D0'):
-                self.OPRND1 = self.memoryList[self.PC + 1]
-                self.OPRND2 = "--"
-                #check if z == 0
-                #position is technically at 02- so then that + 2 should get to the 6C
-                #print(str(whereToJumpTo))
-                #position = position + self.OPRND1 + 1
-                #print(str(position))
+                self.branching(self.Z, 0)
+
 
             elif(self.INS == 'BPL' and self.OPCode == '10'):
-                pass
+#not tested but based off of BCC- tested
+                self.branching(self.N, 0)
+
             elif(self.INS == 'BVC' and self.OPCode == '50'):
-                pass
+#not tested but based off of BCC- tested
+                self.branching(self.V, 0)
+
             elif(self.INS == 'BVS' and self.OPCode == '70'):
-                pass
+#not tested but based off of BCC- tested
+                self.branching(self.V, 1)
+                
             elif(self.INS == 'CMP' and self.OPCode == 'CD'):
                 pass
             elif(self.INS == 'CPX' and self.OPCode == 'EC'):
@@ -645,11 +651,16 @@ class Memory:
 
 
             elif(self.INS == 'JSR' and self.OPCode == '20'):
-#how the fuck is it getting FD? - I'm just doing it by had
-                self.OPRND1 = self.memoryList[self.PC + 1]
-                self.OPRND2 = self.memoryList[self.PC + 2]
-
+#if I am told I have done ths wrong, I will actually cry
+                temp = self.getOPRNDandTemp()
+                lowO = self.PC & 0xFF
+                highO = self.PC & 0xFF00
+                highO >>= 8
+                self.memoryList[self.SP] = highO
+                self.memoryList[self.SP - 1] = lowO     
                 self.SP = self.SP - 2
+                self.newPC = temp
+
 
             elif(self.INS == 'LDA' and self.OPCode == 'AD'):
                 temp = self.getOPRNDandTemp()
@@ -684,7 +695,21 @@ class Memory:
                 temp = self.getOPRNDandTemp()
 
             elif(self.INS == 'RTS' and self.OPCode == '60'):
-                pass
+                self.OPRND1 = "--"
+                self.OPRND2 = "--"
+                operand1 = self.memoryList[self.SP + 1]
+                operand2 = self.memoryList[self.SP + 2]
+                self.SP = self.SP + 2
+                temp = operand2 
+                temp <<= 8
+                temp = operand1 | temp
+                
+                self.newPC = temp + 3
+
+                
+
+
+
             elif(self.INS == 'SBC' and self.OPCode == 'ED'):
                 pass
             elif(self.INS == 'STA' and self.OPCode == '8D'):
@@ -736,17 +761,25 @@ class Memory:
 
             print(stringToPrint)
             stringToPrint = ""
-            if(self.INS != 'BCC' and self.INS != 'BNE' and self.INS != 'JMP'):
+#Jennifer- check against all branching operands- make function for it
+            if(self.INS != 'BCC' and self.INS != 'BNE' and self.INS != 'JMP' and self.INS != 'JSR' and self.INS != 'RTS' 
+            and self.INS != ''):
                 self.PC = self.PC + 1
                 count = count + 1
                 if(self.AMOD == '#' or self.AMOD == 'zpg'):
                     self.PC = self.PC + 1
                 if(self.AMOD == "abs"):
                     self.PC = self.PC + 2
+
             if(self.INS == 'JMP' and self.OPCode == '6C'):
                 self.PC = self.newPC
-            if(self.INS == 'BCC'):
+
+            if(self.INS == 'JSR'):
                 self.PC = self.newPC
+
+            if(self.INS == 'BCC'or self.INS == 'RTS'):
+                self.PC = self.newPC
+#Jennifer- need to do this for all branching- use new PC - make function to check if branching or not
             if(self.INS == 'BNE' and self.Z == 0):
                 self.PC = self.PC + self.OPRND1 + 2
                 
@@ -782,4 +815,28 @@ class Memory:
         temp <<= 8
         temp = self.OPRND1| temp
         return temp
+
+    def reverseTwosComp(self, value):
+        value = 255 - value
+        value = value - 1
+        value = -value
+        return value
+
+    def signExtendedSubtraction(self, value1, value2):
+        value1 = sign_extend(value1, 8)
+        value2 = sign_extend(value2, 8)
+        return value1 - value2 
+
+    def signExtendedAdditionForBranch(self, value1, value2):
+        if(value1 > 127):
+            value1 = self.reverseTwosComp(value1)
+        return value1 + value2 
+   
+    def branching(self, flag, flagSet):
+        self.OPRND1 = self.memoryList[self.PC + 1]
+        self.OPRND2 = "--"
+        if(flag == flagSet):
+            self.newPC = self.signExtendedAdditionForBranch(self.OPRND1, self.PC)
+
+
 
