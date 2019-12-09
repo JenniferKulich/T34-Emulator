@@ -107,6 +107,7 @@ class Memory:
         self.OPCode = '1'
         self.PCStrorage = 0
         self.newPC = 0
+        self.offset = 0
 
 
 
@@ -168,8 +169,8 @@ class Memory:
 
             elif self.INS == 'DEY':
                 self.YR = self.YR - 1
-                self.checkingNegativeAndZero(self.YR)
                 self.YR &= 255
+                self.checkingNegativeAndZero(self.YR)
                 self.OPRND1 = "--"
                 self.OPRND2 = '--'
 
@@ -584,9 +585,10 @@ class Memory:
 
 
             elif(self.INS == 'BIT' and self.OPCode == '2C'):
-#need to move into SR
+#need to get the top 2 bits
                 temp = self.getOPRNDandTemp()
                 operation = self.AC & self.memoryList[temp]
+                self.checkingNegativeAndZero(operation)
 
         
 
@@ -762,8 +764,7 @@ class Memory:
             print(stringToPrint)
             stringToPrint = ""
 #Jennifer- check against all branching operands- make function for it
-            if(self.INS != 'BCC' and self.INS != 'BNE' and self.INS != 'JMP' and self.INS != 'JSR' and self.INS != 'RTS' 
-            and self.INS != ''):
+            if(self.INS != 'BCC' and self.INS != 'BNE' and self.INS != 'JMP' and self.INS != 'JSR' and self.INS != 'RTS'):
                 self.PC = self.PC + 1
                 count = count + 1
                 if(self.AMOD == '#' or self.AMOD == 'zpg'):
@@ -780,8 +781,8 @@ class Memory:
             if(self.INS == 'BCC'or self.INS == 'RTS'):
                 self.PC = self.newPC
 #Jennifer- need to do this for all branching- use new PC - make function to check if branching or not
-            if(self.INS == 'BNE' and self.Z == 0):
-                self.PC = self.PC + self.OPRND1 + 2
+            if(self.INS == 'BNE'):
+                self.PC = self.newPC
                 
 
 
@@ -818,7 +819,7 @@ class Memory:
 
     def reverseTwosComp(self, value):
         value = 255 - value
-        value = value - 1
+        value = value + 1
         value = -value
         return value
 
@@ -830,13 +831,16 @@ class Memory:
     def signExtendedAdditionForBranch(self, value1, value2):
         if(value1 > 127):
             value1 = self.reverseTwosComp(value1)
-        return value1 + value2 
+        temp = value1 + value2
+        return temp  
    
     def branching(self, flag, flagSet):
         self.OPRND1 = self.memoryList[self.PC + 1]
         self.OPRND2 = "--"
         if(flag == flagSet):
-            self.newPC = self.signExtendedAdditionForBranch(self.OPRND1, self.PC)
+            self.newPC = self.signExtendedAdditionForBranch(self.OPRND1, self.PC + 1) + 1 
+        else: 
+            self.newPC = self.PC + 2
 
 
 
