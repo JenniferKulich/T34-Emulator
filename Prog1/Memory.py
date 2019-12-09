@@ -764,7 +764,7 @@ class Memory:
             print(stringToPrint)
             stringToPrint = ""
 #Jennifer- check against all branching operands- make function for it
-            if(self.INS != 'BCC' and self.INS != 'BNE' and self.INS != 'JMP' and self.INS != 'JSR' and self.INS != 'RTS'):
+            if(not self.checkIfBranchingCode() and self.INS != 'JMP' and self.INS != 'JSR' and self.INS != 'RTS'):
                 self.PC = self.PC + 1
                 count = count + 1
                 if(self.AMOD == '#' or self.AMOD == 'zpg'):
@@ -778,10 +778,10 @@ class Memory:
             if(self.INS == 'JSR'):
                 self.PC = self.newPC
 
-            if(self.INS == 'BCC'or self.INS == 'RTS'):
+            if(self.INS == 'RTS' ):
                 self.PC = self.newPC
-#Jennifer- need to do this for all branching- use new PC - make function to check if branching or not
-            if(self.INS == 'BNE'):
+
+            if(self.checkIfBranchingCode()):
                 self.PC = self.newPC
                 
 
@@ -789,6 +789,12 @@ class Memory:
 
     def FormatString(self):
         print(" PC  OPC  INS   AMOD OPRND  AC XR YR SP NV-BDIZC")
+
+    def checkIfBranchingCode(self):
+        if(self.INS == 'BCC' or self.INS == 'BCS' or self.INS == 'BEQ' or self.INS == 'BMI'
+        or self.INS == 'BNE' or self.INS == 'BPL' or self.INS == 'BVC' or self.INS == 'BVS'):
+            return True
+        return False
 
 
     def checkingNegativeAndZero(self, register):
