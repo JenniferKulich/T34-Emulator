@@ -540,28 +540,26 @@ class Memory:
                 self.checkingNegativeAndZero(self.AC)
 
             elif(self.INS == 'AND' and self.OPCode == '2D'):
-#not tested but taken from code that was tested
                 temp = self.getOPRNDandTemp()
                 self.AC = self.AC & self.memoryList[temp]
                 self.checkingNegativeAndZero[self.AC]
 
             elif(self.INS == 'ASL' and self.OPCode == '0E'):
-#need to move into SR
                 temp = self.getOPRNDandTemp()
+                self.C = ( self.memoryList[temp] & 128 ) >> 7
+                self.memoryList[temp] <<= 1
+                self.memoryList[temp] &= 255
+                self.checkingNegativeAndZero(self.memoryList[temp])
+                self.checkForCarrySet(self.memoryList[temp])
 
             elif(self.INS == 'BCC' and self.OPCode == '90'):
                 self.branching(self.C, 0)
                   
-
             elif(self.INS == 'BSC' and self.OPCode == 'BO'):
-#not tested but based off of BCC- tested
                 self.branching(self.C, 1)
 
-
             elif(self.INS == 'BEQ' and self.OPCode == 'F0'):
-#not tested but based off of BCC- tested
                 self.branching(self.Z, 1)
-
 
             elif(self.INS == 'BIT' and self.OPCode == '2C'):
 #need to get the top 2 bits
@@ -569,29 +567,19 @@ class Memory:
                 operation = self.AC & self.memoryList[temp]
                 self.checkingNegativeAndZero(operation)
 
-        
-
-
-
             elif(self.INS == 'BMI' and self.OPCode == '30'):
-#not tested but based off of BCC- tested
                 self.branching(self.N, 1)
-
 
             elif(self.INS == 'BNE' and self.OPCode == 'D0'):
                 self.branching(self.Z, 0)
 
-
             elif(self.INS == 'BPL' and self.OPCode == '10'):
-#not tested but based off of BCC- tested
                 self.branching(self.N, 0)
 
             elif(self.INS == 'BVC' and self.OPCode == '50'):
-#not tested but based off of BCC- tested
                 self.branching(self.V, 0)
 
             elif(self.INS == 'BVS' and self.OPCode == '70'):
-#not tested but based off of BCC- tested
                 self.branching(self.V, 1)
                 
             elif(self.INS == 'CMP' and self.OPCode == 'CD'):
@@ -602,7 +590,6 @@ class Memory:
                 if(checkForCarry > 0 or twosComp ==0):
                     self.C = 1
                 self.checkingNegativeAndZero(temp)
-                self.OPRND1 - self.memoryList[temp]
                 if(self.C == 1):
                     self.N = 0
 
@@ -614,7 +601,6 @@ class Memory:
                 if(checkForCarry > 0 or twosComp == 0):
                     self.C = 1
                 self.checkingNegativeAndZero(temp)
-                self.OPRND1 - self.memoryList[temp]
                 if(self.C == 1):
                     self.N = 0
 
@@ -626,25 +612,20 @@ class Memory:
                 if(checkForCarry > 0 or twosComp ==0):
                     self.C = 1
                 self.checkingNegativeAndZero(temp)
-                self.OPRND1 - self.memoryList[temp]
                 if(self.C == 1):
                     self.N = 0
 
-
             elif(self.INS == 'DEC' and self.OPCode == 'CE'):
-#not tested but taken from one that was tested
                 temp = self.getOPRNDandTemp()
                 self.memoryList[temp] = self.memoryList[temp] - 1
                 self.checkingNegativeAndZero(self.memoryList[temp])
 
             elif(self.INS == 'EOR' and self.OPCode == '4D'):
-#not tested but taken from one that was tested
                 temp = self.getOPRNDandTemp()
                 self.AC = self.AC ^ self.memoryList[temp]
                 self.checkingNegativeAndZero(self.AC)
 
             elif(self.INS == 'INC' and self.OPCode == 'EE'):
-#not tested but taken from one that was tested
                 temp = self.getOPRNDandTemp()
                 self.memoryList[temp] = self.memoryList[temp] + 1
                 self.checkingNegativeAndZero(self.memoryList[temp])
@@ -686,17 +667,37 @@ class Memory:
                 self.checkingNegativeAndZero(self.YR)
 
             elif(self.INS == 'LSR' and self.OPCode == '4E'):
-                pass
+                fromMemory = self.getOPRNDandTemp()
+                self.C = self.memoryList[fromMemory] & 1
+                self.memoryList[fromMemory] >>= 1
+                if sself.memoryList[fromMemory] == 0:
+                    self.Z  = 1
+                else:
+                    self.Z = 0
+
+
             elif(self.INS == 'ORA' and self.OPCode == '0D'):
                 temp = self.getOPRNDandTemp()
                 self.AC = self.AC | self.memoryList[temp]
 
             elif(self.INS == 'ROL' and self.OPCode == '2E'):
-                pass
+                fromMemory = self.getOPRNDandTemp()
+                temp = self.C
+                self.C = (self.memoryList[fromMemory] & 128 ) >> 7
+                self.memoryList[fromMemory] <<= 1
+                self.memoryList[fromMemory] |= temp
+                self.memoryList[fromMemory] &= 255
+                self.checkingNegativeAndZero(self.memoryList[fromMemory])
+
 
             elif(self.INS == 'ROR' and self.OPCode == '6E'):
-#need to move into SR
-                temp = self.getOPRNDandTemp()
+                fromMemory = self.getOPRNDandTemp()
+                temp = self.C
+                self.C = self.memoryList[fromMemory] & 1
+                self.memoryList[fromMemory] >>= 1
+                self.memoryList[fromMemory] |= temp << 7
+                self.memoryList[fromMemory] &= 255
+                self.checkingNegativeAndZero(self.memoryList[fromMemory])
 
             elif(self.INS == 'RTS' and self.OPCode == '60'):
                 self.OPRND1 = "--"
@@ -707,26 +708,26 @@ class Memory:
                 temp = operand2 
                 temp <<= 8
                 temp = operand1 | temp
-                
                 self.newPC = temp + 3
 
-                
-
-
-
             elif(self.INS == 'SBC' and self.OPCode == 'ED'):
-                pass
+                temp = self.getOPRNDandTemp()
+                self.AC = self.AC - self.memoryList[temp]
+                if(self.C == 0):
+                    self.AC = self.AC - 1
+                self.AC = self.AC & 255
+                self.OPRND1 = self.memoryList[temp]
+                self.checkingNegativeAndZero(self.AC)
+
             elif(self.INS == 'STA' and self.OPCode == '8D'):
                 temp = self.getOPRNDandTemp()
                 self.memoryList[temp] = self.AC
 
             elif(self.INS == 'STX' and self.OPCode == '8E'):
-#not tested but taken from one that's been tested
                 temp = self.getOPRNDandTemp()
                 self.memoryList[temp] = self.XR
 
             elif(self.INS == 'STY' and self.OPCode == '8C'):
-#not tested but taken from one that's been tested
                 temp = self.getOPRNDandTemp()
                 self.memoryList[temp] = self.YR
 
