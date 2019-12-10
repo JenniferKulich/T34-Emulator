@@ -675,7 +675,6 @@ class Memory:
                 else:
                     self.Z = 0
 
-
             elif(self.INS == 'ORA' and self.OPCode == '0D'):
                 temp = self.getOPRNDandTemp()
                 self.AC = self.AC | self.memoryList[temp]
@@ -688,7 +687,6 @@ class Memory:
                 self.memoryList[fromMemory] |= temp
                 self.memoryList[fromMemory] &= 255
                 self.checkingNegativeAndZero(self.memoryList[fromMemory])
-
 
             elif(self.INS == 'ROR' and self.OPCode == '6E'):
                 fromMemory = self.getOPRNDandTemp()
