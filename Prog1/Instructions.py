@@ -1,6 +1,5 @@
 class Instructions:
 
-
     instructions = {'0A': {'instruction': 'ASL', 'AMOD': 'A'},
     '06': {'instruction': 'ASL', 'AMOD': 'oper'},
     '16': {'instruction': 'ASL', 'AMOD': 'oper'},

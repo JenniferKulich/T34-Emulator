@@ -8,7 +8,6 @@ class Memory:
     OPCode = 1;
 
 
-
     OPRND1 = 0
     OPRND2 = "--"
     AC = 0
